@@ -8,21 +8,21 @@
 <template>
   <div class="home-container">
     <div class="home-card">
-      <h1>🚀 Bienvenido</h1>
-      <p class="subtitle">Sistema de Autenticación con Vue.js y NestJS</p>
+      <h1>Bienvenido</h1>
+      <p class="subtitle">Sistema de Autenticación Centralizado</p>
 
       <div class="features">
         <div class="feature">
-          <span class="icon">🔐</span>
-          <span>Autenticación JWT</span>
+          <span class="icon"></span>
+          <span>Autenticación JWT Segura</span>
         </div>
         <div class="feature">
-          <span class="icon">🛡️</span>
+          <span class="icon"></span>
           <span>Rutas Protegidas</span>
         </div>
         <div class="feature">
-          <span class="icon">⚡</span>
-          <span>Vue 3 + Vite</span>
+          <span class="icon"></span>
+          <span>Vue 3 + NestJS</span>
         </div>
       </div>
 
@@ -72,19 +72,20 @@ const handleLogout = () => {
 
 <style scoped>
 .home-container {
-  min-height: 100vh;
+  min-height: calc(100vh - 64px);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f7f9fc;
   padding: 20px;
 }
 
 .home-card {
   background: white;
   padding: 50px;
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  border: 1px solid #e1e4e8;
+  border-radius: 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   text-align: center;
   max-width: 500px;
   width: 100%;
@@ -93,11 +94,13 @@ const handleLogout = () => {
 h1 {
   font-size: 36px;
   margin-bottom: 8px;
-  color: #333;
+  color: #0A2540;
+  font-weight: 600;
+  letter-spacing: -0.5px;
 }
 
 .subtitle {
-  color: #666;
+  color: #4a5568;
   margin-bottom: 30px;
   font-size: 16px;
 }
@@ -105,7 +108,7 @@ h1 {
 .features {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 15px;
   margin-bottom: 40px;
   flex-wrap: wrap;
 }
@@ -114,15 +117,17 @@ h1 {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
-  background: #f5f5f5;
-  border-radius: 20px;
+  padding: 8px 16px;
+  background: #edf2f7;
+  border: 1px solid #e2e8f0;
+  border-radius: 2px;
   font-size: 14px;
-  color: #555;
+  color: #2d3748;
+  font-weight: 500;
 }
 
 .icon {
-  font-size: 18px;
+  display: none;
 }
 
 .actions {
@@ -134,31 +139,33 @@ h1 {
 .btn {
   display: block;
   padding: 14px 24px;
-  border-radius: 8px;
+  border-radius: 2px;
   font-size: 16px;
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s;
   border: none;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0A2540;
   color: white;
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+  background: #1a3c63;
 }
 
 .btn-secondary {
   background: white;
-  color: #667eea;
-  border: 2px solid #667eea;
+  color: #0A2540;
+  border: 2px solid #0A2540;
 }
 
 .btn-secondary:hover {
-  background: #f5f5f5;
+  background: #f7f9fc;
 }
 </style>

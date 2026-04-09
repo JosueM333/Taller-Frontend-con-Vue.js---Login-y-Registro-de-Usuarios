@@ -9,13 +9,31 @@ import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
+  private blacklist: Set<string> = new Set();
+  private refreshTokens: Map<number, string> = new Map();
+
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
+
+  isBlacklisted(jti: string): boolean {
+    return this.blacklist.has(jti);
+  }
+
+  getUserById(userId: number) {
+    return this.usersService.findById(userId);
+  }
+
+  logout(jti: string) {
+    if (jti) {
+      this.blacklist.add(jti);
+    }
+  }
 
   async register(registerDto: RegisterDto) {
     const { nombre, email, password } = registerDto;
@@ -48,13 +66,47 @@ export class AuthService {
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) throw new UnauthorizedException('Credenciales inválidas');
 
-    const payload = { sub: user.id, email: user.email, nombre: user.nombre };
+    const sessionId = uuidv4();
+    user.sessionId = sessionId;
+
+    const jti = uuidv4();
+    const payload = { sub: user.id, email: user.email, nombre: user.nombre, sessionId, jti };
+    
     const access_token = await this.jwtService.signAsync(payload);
+    const refresh_token = uuidv4(); // Rotación de refresh token
+
+    this.refreshTokens.set(user.id, refresh_token);
 
     return {
       message: 'Login exitoso',
       access_token,
+      refresh_token,
       user: { id: user.id, nombre: user.nombre, email: user.email },
+    };
+  }
+
+  async refreshToken(userId: number, providedRefreshToken: string) {
+    const user = this.usersService.findById(userId);
+    if (!user) throw new UnauthorizedException('Usuario no válido');
+
+    const expectedRefreshToken = this.refreshTokens.get(userId);
+    if (!expectedRefreshToken || expectedRefreshToken !== providedRefreshToken) {
+      // Invalida todo si detecta reúso o token inválido
+      this.refreshTokens.delete(userId);
+      throw new UnauthorizedException('Refresh token revocado o incorrecto');
+    }
+
+    // Rotamos el refresh token
+    const newRefreshToken = uuidv4();
+    this.refreshTokens.set(userId, newRefreshToken);
+
+    const jti = uuidv4();
+    const payload = { sub: user.id, email: user.email, nombre: user.nombre, sessionId: user.sessionId, jti };
+    const access_token = await this.jwtService.signAsync(payload);
+
+    return {
+      access_token,
+      refresh_token: newRefreshToken,
     };
   }
 

@@ -5,7 +5,8 @@
 // ============================================
 
 // Injectable: Decorador que permite inyectar este servicio en otros componentes
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Inject, forwardRef } from '@nestjs/common';
+import { AuthService } from '../auth.service';
 
 // PassportStrategy: Clase base que conecta NestJS con la librería Passport
 // Passport es una librería de autenticación muy popular en Node.js
@@ -24,7 +25,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 // - En producción, debe estar en variables de entorno (.env)
 // - Si alguien conoce esta clave, puede crear tokens falsos
 // - Debe ser una cadena larga y aleatoria
-export const JWT_SECRET = 'mi_clave_secreta_muy_segura_2024';
+export const JWT_SECRET = 'w9v8xO#L!Dk3Nf7G@RcV$bYp2Z&t5H*jQmEs1U^aXy4C+r6W(h9T)K-P=A/M';
 
 // ============================================
 // ESTRATEGIA JWT
@@ -41,7 +42,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   // ==========================================
   // CONSTRUCTOR: CONFIGURACIÓN DE LA ESTRATEGIA
   // ==========================================
-  constructor() {
+  constructor(
+    @Inject(forwardRef(() => AuthService))
+    private authService: AuthService,
+  ) {
     // super() llama al constructor de la clase padre (PassportStrategy)
     // Le pasamos un objeto de configuración con las opciones de JWT
     super({
@@ -49,16 +53,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       // ------------------------------------------
       // jwtFromRequest: ¿De dónde extraemos el token?
       // ------------------------------------------
-      // ExtractJwt.fromAuthHeaderAsBearerToken() busca el token en:
-      // Header HTTP: "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
-      //                              ^^^^^^^ Prefijo obligatorio
-      //                                      ^^^^^^^^^^^^^^^^^^^^^ Token JWT
-      // 
-      // Otras opciones disponibles (no usadas aquí):
-      // - fromHeader('x-token'): Busca en un header personalizado
-      // - fromBodyField('token'): Busca en el body de la petición
-      // - fromUrlQueryParameter('token'): Busca en ?token=xxx
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (request: any) => {
+          let data = request?.cookies?.access_token;
+          if (!data) {
+            data = ExtractJwt.fromAuthHeaderAsBearerToken()(request);
+          }
+          return data;
+        },
+      ]),
 
       // ------------------------------------------
       // ignoreExpiration: ¿Aceptamos tokens expirados?
@@ -109,39 +112,24 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   //   exp: 1705398600            // Expiration: cuándo expira el token
   // }
   async validate(payload: any) {
-    
-    // Lo que retornemos aquí se adjuntará a la petición HTTP
-    // Estará disponible en req.user en cualquier controlador
-    //
-    // Ejemplo de uso en un controlador:
-    // @Get('profile')
-    // getProfile(@Request() req) {
-    //   console.log(req.user.userId);  // 1
-    //   console.log(req.user.email);   // "juan@test.com"
-    // }
-    //
-    // NOTA: Retornamos solo los datos necesarios, no todo el payload
-    // Esto es una buena práctica de seguridad (principio de mínimo privilegio)
+    // 1. Verificar Blacklist (Test 1: Revocación)
+    if (this.authService.isBlacklisted(payload.jti)) {
+      throw new UnauthorizedException('Token revocado');
+    }
+
+    // 2. Verificar sesión concurrente (Test 8: Sesiones concurrentes)
+    const user = this.authService.getUserById(payload.sub);
+    if (!user || user.sessionId !== payload.sessionId) {
+      throw new UnauthorizedException('Sesión invalidada por un nuevo inicio de sesión');
+    }
+
     return {
-      userId: payload.sub,      // Mapeamos "sub" a "userId" para mayor claridad
-      email: payload.email,     // Email del usuario autenticado
-      nombre: payload.nombre,   // Nombre del usuario autenticado
+      userId: payload.sub,
+      email: payload.email,
+      nombre: payload.nombre,
+      jti: payload.jti,
+      sessionId: payload.sessionId,
     };
-    
-    // NOTA AVANZADA: Aquí podríamos hacer validaciones adicionales:
-    // - Verificar que el usuario aún existe en la base de datos
-    // - Verificar que el usuario no esté bloqueado
-    // - Verificar que el token no esté en una "lista negra"
-    // 
-    // Ejemplo:
-    // const user = await this.usersService.findById(payload.sub);
-    // if (!user) {
-    //   throw new UnauthorizedException('Usuario no encontrado');
-    // }
-    // if (user.bloqueado) {
-    //   throw new UnauthorizedException('Usuario bloqueado');
-    // }
-    // return user;
   }
 }
 

@@ -13,6 +13,7 @@ import axios from 'axios'
 // Ejemplo: api.get('/auth/login') → GET http://localhost:3000/auth/login
 const api = axios.create({
     baseURL: 'http://localhost:3000',
+    withCredentials: true,
     headers: {
         'Content-Type': 'application/json'
     }
@@ -26,18 +27,11 @@ const api = axios.create({
  */
 api.interceptors.request.use(
     (config) => {
-        // Buscar el token en localStorage
-        const token = localStorage.getItem('access_token')
-
-        // Si existe un token, agregarlo al header Authorization
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`
-        }
-
+        // En lugar de inyectar el Authorization header manually, Axios enviará
+        // automáticamente las cookies HttpOnly (mitigando Test 7: XSS)
         return config
     },
     (error) => {
-        // Si hay un error en la configuración de la petición
         return Promise.reject(error)
     }
 )
@@ -56,8 +50,9 @@ api.interceptors.response.use(
     (error) => {
         // Si el error es 401 (No autorizado), el token probablemente expiró
         if (error.response && error.response.status === 401) {
-            // Limpiar el token inválido
-            localStorage.removeItem('access_token')
+            // Eliminar estado loggeado del frontend (Test 1 & 4)
+            localStorage.removeItem('logged_in');
+            localStorage.removeItem('auth_user');
 
             // Opcional: Redirigir al login
             // window.location.href = '/login'

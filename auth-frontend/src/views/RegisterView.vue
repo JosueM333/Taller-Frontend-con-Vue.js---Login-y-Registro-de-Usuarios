@@ -172,8 +172,9 @@ const handleRegister = async () => {
 .register-card {
   background: white;
   padding: 40px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e1e4e8;
+  border-radius: 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   width: 100%;
   max-width: 400px;
 }
@@ -220,17 +221,20 @@ input:disabled {
 .btn-primary {
   width: 100%;
   padding: 14px;
-  background-color: #2196F3;
+  background-color: #0A2540;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 2px;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: #1976D2;
+  background-color: #1a3c63;
 }
 
 .btn-primary:disabled {
@@ -273,8 +277,9 @@ input:disabled {
 }
 
 .login-link a {
-  color: #2196F3;
+  color: #0A2540;
   text-decoration: none;
+  font-weight: 600;
 }
 
 .login-link a:hover {

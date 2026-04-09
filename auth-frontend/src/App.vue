@@ -7,9 +7,9 @@
 -->
 <template>
   <div id="app">
-    <!-- Barra de navegación simple -->
+    <!-- Barra de navegación -->
     <nav class="navbar">
-      <router-link to="/" class="brand">🏠 Mi App</router-link>
+      <router-link to="/" class="brand">Control de Acceso</router-link>
       
       <div class="nav-links">
         <router-link to="/">Inicio</router-link>
@@ -68,39 +68,44 @@ body {
 
 /* Navbar */
 .navbar {
-  background: white;
-  padding: 16px 24px;
+  background: #0A2540;
+  padding: 16px 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-bottom: 2px solid #1a3c63;
 }
 
 .brand {
   font-size: 20px;
-  font-weight: bold;
+  font-weight: 600;
   text-decoration: none;
-  color: #333;
+  color: #ffffff;
+  letter-spacing: 0.5px;
 }
 
 .nav-links {
   display: flex;
-  gap: 20px;
+  gap: 24px;
 }
 
 .nav-links a {
   text-decoration: none;
-  color: #666;
-  transition: color 0.3s;
+  color: #a0aec0;
+  font-weight: 500;
+  transition: color 0.2s;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
 }
 
 .nav-links a:hover {
-  color: #333;
+  color: #ffffff;
 }
 
 .nav-links a.router-link-active {
-  color: #667eea;
-  font-weight: 500;
+  color: #ffffff;
+  border-bottom: 2px solid #ffffff;
 }
 
 /* Main content */

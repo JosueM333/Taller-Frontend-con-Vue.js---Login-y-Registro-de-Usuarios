@@ -127,8 +127,9 @@ onMounted(() => {
 .profile-card {
   background: white;
   padding: 40px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e1e4e8;
+  border-radius: 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   width: 100%;
   max-width: 500px;
   text-align: center;
@@ -156,8 +157,8 @@ h1 {
   /* Círculo con la inicial del usuario */
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 50%;
+  background: #0A2540;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -197,16 +198,19 @@ h1 {
 .btn-logout {
   width: 100%;
   padding: 14px;
-  background-color: #ff5722;
+  background-color: #2d3748;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 2px;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
 }
 
 .btn-logout:hover {
-  background-color: #e64a19;
+  background-color: #4a5568;
 }
 </style>

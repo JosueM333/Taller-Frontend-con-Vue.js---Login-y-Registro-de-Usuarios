@@ -12,7 +12,8 @@ import { JwtStrategy, JWT_SECRET } from './strategies/jwt.strategy';
     PassportModule,
     JwtModule.register({
       secret: JWT_SECRET,
-      signOptions: { expiresIn: '24h' }, // Token válido por 24 horas
+      signOptions: { expiresIn: '15m' }, // Test 4: Token válido por poco tiempo
+      verifyOptions: { algorithms: ['HS256'] }, // Test 3: Ataque Algoritmo Nulo
     }),
   ],
   controllers: [AuthController],

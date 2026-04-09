@@ -138,8 +138,9 @@ const handleLogin = async () => {
   /* Tarjeta blanca centrada */
   background: white;
   padding: 40px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e1e4e8;
+  border-radius: 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   width: 100%;
   max-width: 400px;
 }
@@ -193,17 +194,20 @@ input:disabled {
   /* Botón principal */
   width: 100%;
   padding: 14px;
-  background-color: #4CAF50;
+  background-color: #0A2540;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 2px;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: #45a049;
+  background-color: #1a3c63;
 }
 
 .btn-primary:disabled {
@@ -231,8 +235,9 @@ input:disabled {
 }
 
 .register-link a {
-  color: #4CAF50;
+  color: #0A2540;
   text-decoration: none;
+  font-weight: 600;
 }
 
 .register-link a:hover {

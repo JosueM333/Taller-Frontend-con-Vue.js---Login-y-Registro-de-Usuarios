@@ -41,9 +41,11 @@ const authService = {
         try {
             const response = await api.post('/auth/login', credentials)
 
-            // Si el login es exitoso, guardar el token
-            if (response.data.access_token) {
-                localStorage.setItem('access_token', response.data.access_token)
+            // Guardar estado loggeado y refresh token
+            if (response.data.refresh_token) {
+                localStorage.setItem('logged_in', 'true')
+                localStorage.setItem('refresh_token', response.data.refresh_token)
+                localStorage.setItem('auth_user', JSON.stringify(response.data.user))
             }
 
             return response.data
@@ -66,27 +68,57 @@ const authService = {
     },
 
     /**
-     * Cerrar sesión
-     * Elimina el token del almacenamiento local
+     * Cerrar sesión invocando al backend (Test 1)
      */
-    logout() {
-        localStorage.removeItem('access_token')
+    async logout() {
+        try {
+            await api.post('/auth/logout')
+        } catch (error) {
+            console.error('Error al revocar sesión en el backend', error)
+        } finally {
+            localStorage.removeItem('logged_in')
+            localStorage.removeItem('refresh_token')
+            localStorage.removeItem('auth_user')
+        }
     },
 
     /**
-     * Verificar si hay un usuario autenticado
-     * @returns {boolean} - true si existe un token guardado
+     * Refrescar el token
+     */
+    async refresh() {
+        try {
+            const refreshToken = localStorage.getItem('refresh_token')
+            const userStr = localStorage.getItem('auth_user')
+            if (!refreshToken || !userStr) throw new Error('No hay refresh token activo')
+
+            const user = JSON.parse(userStr)
+            const response = await api.post('/auth/refresh', {
+                refresh_token: refreshToken,
+                userId: user.id
+            })
+
+            localStorage.setItem('refresh_token', response.data.refresh_token)
+            return response.data
+        } catch (error) {
+            this.logout()
+            throw error
+        }
+    },
+
+    /**
+     * Verificar si hay un usuario autenticado basado en flag
+     * @returns {boolean} - true si parece estar loggeado
      */
     isAuthenticated() {
-        return !!localStorage.getItem('access_token')
+        return !!localStorage.getItem('logged_in')
     },
 
     /**
-     * Obtener el token actual
-     * @returns {string|null} - El token o null si no existe
+     * Obtener el token actual (Reemplazado por Cookies HttpOnly)
+     * @returns {null} - Ya no es accesible por JS
      */
     getToken() {
-        return localStorage.getItem('access_token')
+        return null
     }
 }
 

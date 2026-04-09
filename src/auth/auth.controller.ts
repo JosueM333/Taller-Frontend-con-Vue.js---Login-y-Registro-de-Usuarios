@@ -4,8 +4,11 @@ import {
   Get, 
   Body, 
   UseGuards, 
-  Request 
+  Request,
+  Res,
+  UnauthorizedException 
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -31,8 +34,65 @@ export class AuthController {
    * Ruta PÚBLICA
    */
   @Post('login')
-  login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
+    const result = await this.authService.login(loginDto);
+    
+    // Cookie parameters (HttpOnly para XSS mitigación)
+    res.cookie('access_token', result.access_token, {
+      httpOnly: true,
+      secure: false, // Set to true en producción HTTPS
+      sameSite: 'lax',
+      maxAge: 15 * 60 * 1000, // 15 minutos
+    });
+
+    return {
+      message: result.message,
+      user: result.user,
+      refresh_token: result.refresh_token // Enviamos refresh token en body para guardarlo en memoria o localStorage del Front
+    };
+  }
+
+  /**
+   * POST /auth/logout
+   * Cierre de sesión (Falta de Revocación mitigada Test 1)
+   */
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  logout(@Request() req, @Res({ passthrough: true }) res: Response) {
+    const jti = req.user.jti;
+    this.authService.logout(jti);
+    
+    // Limpiamos la cookie
+    res.clearCookie('access_token');
+    
+    return {
+      message: 'Cierre de sesión exitoso y token revocado.',
+    };
+  }
+
+  /**
+   * POST /auth/refresh
+   * Rotación de tokens (Mitigación persitencia e indifinición Test 4 & 6)
+   */
+  @Post('refresh')
+  async refresh(@Body('refresh_token') refreshToken: string, @Body('userId') userId: number, @Res({ passthrough: true }) res: Response) {
+    if (!refreshToken || !userId) {
+      throw new UnauthorizedException('Faltan parámetros de refresco');
+    }
+    
+    const result = await this.authService.refreshToken(userId, refreshToken);
+    
+    res.cookie('access_token', result.access_token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 15 * 60 * 1000,
+    });
+
+    return {
+      message: 'Token refrescado correctamente',
+      refresh_token: result.refresh_token
+    };
   }
 
   /**

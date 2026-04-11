@@ -27,4 +27,21 @@ export class UsersService {
   findAll(): Omit<User, 'password'>[] {
     return this.users.map(({ password, ...rest }) => rest);
   }
+
+  savePaymentInfo(userId: number, paymentInfo: { cardNumber: string; cardName: string; expirationDate: string; cvv: string }): User | undefined {
+    const user = this.findById(userId);
+    if (user) {
+      user.paymentInfo = paymentInfo;
+      return user;
+    }
+    return undefined;
+  }
+
+  getPaymentInfo(userId: number): any {
+    const user = this.findById(userId);
+    if (user && user.paymentInfo) {
+      return user.paymentInfo;
+    }
+    return null;
+  }
 }

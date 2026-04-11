@@ -16,6 +16,7 @@ import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import ProfileView from '../views/ProfileView.vue'
+import PaymentView from '../views/PaymentView.vue'
 
 /**
  * Definición de rutas
@@ -51,6 +52,14 @@ const routes = [
         path: '/profile',
         name: 'Profile',
         component: ProfileView,
+        meta: {
+            requiresAuth: true   // Solo accesible si ESTÁ autenticado
+        }
+    },
+    {
+        path: '/payment',
+        name: 'Payment',
+        component: PaymentView,
         meta: {
             requiresAuth: true   // Solo accesible si ESTÁ autenticado
         }

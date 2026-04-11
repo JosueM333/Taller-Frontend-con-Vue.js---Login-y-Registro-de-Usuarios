@@ -121,4 +121,12 @@ export class AuthService {
       user: safeUser,
     };
   }
+
+  savePaymentInfo(userId: number, paymentInfo: any) {
+    return this.usersService.savePaymentInfo(userId, paymentInfo);
+  }
+
+  getPaymentInfo(userId: number) {
+    return this.usersService.getPaymentInfo(userId);
+  }
 }

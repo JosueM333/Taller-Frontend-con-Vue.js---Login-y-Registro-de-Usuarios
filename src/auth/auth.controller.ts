@@ -124,4 +124,31 @@ export class AuthController {
       userId: req.user.userId,
     };
   }
+
+  /**
+   * POST /auth/payment-info
+   * Guardar datos de tarjeta simulada
+   */
+  @UseGuards(JwtAuthGuard)
+  @Post('payment-info')
+  savePaymentInfo(@Request() req, @Body() paymentInfo: any) {
+    this.authService.savePaymentInfo(req.user.userId, paymentInfo);
+    return {
+      message: 'Datos de pago guardados correctamente y protegidos.',
+    };
+  }
+
+  /**
+   * GET /auth/payment-info
+   * Obtener datos de tarjeta simulada
+   */
+  @UseGuards(JwtAuthGuard)
+  @Get('payment-info')
+  getPaymentInfo(@Request() req) {
+    const paymentInfo = this.authService.getPaymentInfo(req.user.userId);
+    return {
+      message: 'Datos de pago obtenidos',
+      paymentInfo: paymentInfo || null,
+    };
+  }
 }

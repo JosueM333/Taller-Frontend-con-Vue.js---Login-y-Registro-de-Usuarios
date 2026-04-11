@@ -22,6 +22,7 @@
         
         <template v-else>
           <router-link to="/profile">Perfil</router-link>
+          <router-link to="/payment">Datos Privados</router-link>
           <a href="#" @click.prevent="logout">Salir</a>
         </template>
       </div>

@@ -106,6 +106,31 @@ const authService = {
     },
 
     /**
+     * Guardar información de pago (simulado para probar tokens)
+     * @param {Object} paymentData - Datos de tarjeta
+     */
+    async savePaymentInfo(paymentData) {
+        try {
+            const response = await api.post('/auth/payment-info', paymentData)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || { message: 'Error de conexión' }
+        }
+    },
+
+    /**
+     * Obtener información de pago
+     */
+    async getPaymentInfo() {
+        try {
+            const response = await api.get('/auth/payment-info')
+            return response.data.paymentInfo
+        } catch (error) {
+            throw error.response?.data || { message: 'Error de conexión' }
+        }
+    },
+
+    /**
      * Verificar si hay un usuario autenticado basado en flag
      * @returns {boolean} - true si parece estar loggeado
      */

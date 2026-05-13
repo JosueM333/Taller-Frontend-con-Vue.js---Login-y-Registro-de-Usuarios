@@ -1,12 +1,12 @@
-import { 
-  Controller, 
-  Post, 
-  Get, 
-  Body, 
-  UseGuards, 
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  UseGuards,
   Request,
   Res,
-  UnauthorizedException 
+  UnauthorizedException
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -16,7 +16,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   /**
    * POST /auth/register
@@ -36,14 +36,15 @@ export class AuthController {
   @Post('login')
   async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
     const result = await this.authService.login(loginDto);
-    
-    // Cookie parameters (HttpOnly para XSS mitigación)
+
+
     res.cookie('access_token', result.access_token, {
       httpOnly: true,
-      secure: false, // Set to true en producción HTTPS
+      secure: true,
       sameSite: 'lax',
-      maxAge: 15 * 60 * 1000, // 15 minutos
+      maxAge: 15 * 60 * 1000,
     });
+
 
     return {
       message: result.message,
@@ -61,10 +62,10 @@ export class AuthController {
   logout(@Request() req, @Res({ passthrough: true }) res: Response) {
     const jti = req.user.jti;
     this.authService.logout(jti);
-    
+
     // Limpiamos la cookie
     res.clearCookie('access_token');
-    
+
     return {
       message: 'Cierre de sesión exitoso y token revocado.',
     };
@@ -79,12 +80,12 @@ export class AuthController {
     if (!refreshToken || !userId) {
       throw new UnauthorizedException('Faltan parámetros de refresco');
     }
-    
+
     const result = await this.authService.refreshToken(userId, refreshToken);
-    
+
     res.cookie('access_token', result.access_token, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: 'lax',
       maxAge: 15 * 60 * 1000,
     });
